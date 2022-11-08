@@ -12,8 +12,8 @@ void Cartridge::init(vector<byte> &data) {
     const header_ROM_size = data.at(0x148);
     const header_RAM_size = data.at(0x140);
     
-    const number_of_rom_banks = (1 << header_ROM_size) * 2;
-    const number_of_ram_banks = (header_RAM_size == 0x5) ? 8 : (1 << (2 * header_RAM_size)) / 16;
+    const number_of_rom_banks = 2 << header_ROM_size;
+    const number_of_ram_banks = header_RAM_size == 0x5 ? 8 : 1 << 2 * header_RAM_size >> 4;
     
     const rom_size = rom_block_size * number_of_rom_banks;       
     
