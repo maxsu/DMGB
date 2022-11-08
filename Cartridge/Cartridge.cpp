@@ -9,14 +9,16 @@ Cartridge::Cartridge() : number_of_rom_banks(0), number_of_ram_banks(0) {
 
 void Cartridge::init(vector<byte> &data) {
 
-    number_of_rom_banks = (1 << data.at(0x148)) * 2;
+    const header_ROM_size = data.at(0x148);
+    const header_RAM_size = data.at(0x140);
+    
+    const number_of_rom_banks = (1 << header_ROM_size) * 2;
+    const number_of_ram_banks = (header_RAM_size == 0x5) ? 8 : (1 << (2 * header_RAM_size)) / 16;
+    
+    const rom_size = rom_block_size * number_of_rom_banks;       
+    
     rom_banks.resize(number_of_rom_banks, array<byte, rom_block_size>{0});
-
-    number_of_ram_banks = (data.at(0x149) == 0x5) ? 8 : (1 << (2 * data.at(0x149))) / 16;
-
-    ram_banks.resize(number_of_ram_banks, {});
-
-    size_t rom_size = rom_block_size * number_of_rom_banks;
+    ram_banks.resize(number_of_ram_banks, {});   
     for (size_t address = 0; address < rom_size; address++) {
         rom_banks.at(address / rom_block_size).at(address % rom_block_size) = data[address];
     }
